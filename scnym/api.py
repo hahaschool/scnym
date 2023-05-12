@@ -143,6 +143,7 @@ def scnym_api(
     out_path: str = "./scnym_outputs",
     trained_model: str = None,
     config: Union[dict, str] = "new_identity_discovery",
+    base_config: str = "default",
     key_added: str = "scNym",
     copy: bool = False,
     **kwargs,
@@ -187,6 +188,18 @@ def scnym_api(
     config
         Configuration name or dictionary of configuration of parameters.
         Pre-defined configurations:
+            "new_identity_discovery" - Default. Employs pseudolabel thresholding to
+            allow for discovery of new cell identities in the target dataset using
+            scNym confidence scores.
+            "no_new_identity" - Assumes all cells in the target data belong to one
+            of the classes in the training data. Recommended to improve performance
+            when this assumption is valid.
+    base_config
+        Configuration name when a dict is passed to `config`.
+        Pre-defined configurations:
+            "default" - Default. Uses MixMatch and a domain adversary.
+            "no_dan" - Uses MixMatch but no domain adversary.
+            "no_ssl" - Uses a domain adversary but no MixMatch.
             "new_identity_discovery" - Default. Employs pseudolabel thresholding to
             allow for discovery of new cell identities in the target dataset using
             scNym confidence scores.
@@ -276,7 +289,7 @@ def scnym_api(
     else:
         # config is a dictionary of parameters
         # add or update default parameters based on these
-        dconf = CONFIGS["default"]
+        dconf = CONFIGS[base_config]
         for k in config.keys():
             dconf[k] = config[k]
         config = dconf
